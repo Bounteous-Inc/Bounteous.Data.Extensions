@@ -9,7 +9,7 @@ public class ProductionDetectorTests
     public void IsProductionEnvironment_ShouldReturnFalseInDebug()
     {
         // This test runs in Debug configuration, so should return false
-        Assert.False(ProductionDetector.IsProductionEnvironment());
+        Assert.False(ProductionDetector.IsProductionEnvironment);
     }
 
     [Fact]

@@ -23,24 +23,34 @@ public static class ProductionWarningMarker
 {
     /// <summary>
     /// Validates that the current context is appropriate for using development utilities.
+    /// Uses enhanced multi-strategy detection with caching for performance.
     /// Throws an exception if used in production code (except migrations and tests).
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when running in production environment.</exception>
     public static void ValidateContext()
     {
-        if (ProductionDetector.IsProductionEnvironment())
+        if (ProductionDetector.IsProductionEnvironment)
         {
             throw new InvalidOperationException(
                 "Bounteous.Data.Extensions development utilities are not intended for production use. " +
                 "This package bypasses read-only validation and should only be used in testing, " +
                 "migration, or development scenarios. " +
+                $"Current context detection: Production={ProductionDetector.IsProductionEnvironment}, " +
+                $"Allowed={ProductionDetector.IsAllowedContext}. " +
                 "Remove this package reference from production projects.");
         }
     }
 
     /// <summary>
     /// Gets a value indicating whether the current environment is production.
+    /// Uses enhanced multi-strategy detection with caching.
     /// Returns false for migrations and test contexts even in Release configuration.
     /// </summary>
-    public static bool IsProductionEnvironment => ProductionDetector.IsProductionEnvironment();
+    public static bool IsProductionEnvironment => ProductionDetector.IsProductionEnvironment;
+
+    /// <summary>
+    /// Gets a value indicating whether the current context is explicitly allowed.
+    /// Returns true for migrations, tests, and development environments.
+    /// </summary>
+    public static bool IsAllowedContext => ProductionDetector.IsAllowedContext;
 }
