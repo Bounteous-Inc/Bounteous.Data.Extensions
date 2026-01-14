@@ -49,7 +49,7 @@
 
   <!-- Package References (for published package) -->
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <PackageReference Include="Bounteous.Data" Version="0.0.24" />
+    <PackageReference Include="Bounteous.Data" Version="0.0.26" />
     <PackageReference Include="Bounteous.Core" Version="0.0.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
     <!-- SourceLink only included when building for CI/CD -->

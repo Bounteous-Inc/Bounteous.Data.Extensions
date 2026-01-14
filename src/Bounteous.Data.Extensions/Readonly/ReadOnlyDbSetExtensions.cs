@@ -5,25 +5,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Bounteous.Data.Extensions.Readonly;
 
 /// <summary>
-/// Extension methods for DbSet to create ReadOnlyDbSet instances.
-/// </summary>
-public static class DbSetExtensions
-{
-    /// <summary>
-    /// Converts a DbSet to a ReadOnlyDbSet wrapper.
-    /// </summary>
-    /// <typeparam name="T">The entity type.</typeparam>
-    /// <typeparam name="TKey">The key type.</typeparam>
-    /// <param name="dbSet">The DbSet to convert.</param>
-    /// <returns>A ReadOnlyDbSet wrapper.</returns>
-    public static ReadOnlyDbSet<T, TKey> AsReadOnly<T, TKey>(this DbSet<T> dbSet) 
-        where T : class, IReadOnlyEntity<TKey>
-    {
-        return new ReadOnlyDbSet<T, TKey>(dbSet);
-    }
-}
-
-/// <summary>
 /// ⚠️ **NOT INTENDED FOR PRODUCTION USE** ⚠️
 /// 
 /// Extension methods for ReadOnlyDbSet to enable creation of test objects in unit tests and data migrations.
@@ -36,47 +17,48 @@ public static class DbSetExtensions
 /// </summary>
 public static class ReadOnlyDbSetExtensions
 {
-    /// <summary>
-    /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
-    /// Use only in testing or migration scenarios, never in production code.
-    /// 
-    /// Creates an entity using the provided factory function and adds it to the ReadOnlyDbSet.
-    /// This method bypasses read-only validation to enable test data creation.
-    /// </summary>
     /// <param name="readOnlyDbSet"></param>
-    /// <returns>The created entity.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
-    public static System.Threading.Tasks.Task<T> CreateAsync<T, TKey>(this ReadOnlyDbSet<T, TKey> readOnlyDbSet, System.Func<T> entityFactory)
-        where T : class, IReadOnlyEntity<TKey>
+    extension<T, TKey>(ReadOnlyDbSet<T, TKey> readOnlyDbSet) where T : class, IReadOnlyEntity<TKey>
     {
-        ThrowIfInProduction();
-        var innerDbSet = GetInnerDbSet(readOnlyDbSet);
-        var entity = entityFactory();
-        innerDbSet.Add(entity);
-        return System.Threading.Tasks.Task.FromResult(entity);
-    }
+        /// <summary>
+        /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
+        /// Use only in testing or migration scenarios, never in production code.
+        /// 
+        /// Creates an entity using the provided factory function and adds it to the ReadOnlyDbSet.
+        /// This method bypasses read-only validation to enable test data creation.
+        /// </summary>
+        /// <returns>The created entity.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
+        public async Task<T> CreateAsync(Func<T> entityFactory)
+        {
+            ThrowIfInProduction();
+            var innerDbSet = GetInnerDbSet(readOnlyDbSet);
+            var entity = entityFactory();
+            await innerDbSet.AddAsync(entity);
+            return entity;
+        }
 
-    /// <summary>
-    /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
-    /// Use only in testing or migration scenarios, never in production code.
-    /// 
-    /// Creates an array of entities using the provided factory function and adds them to the ReadOnlyDbSet.
-    /// This method bypasses read-only validation to enable bulk test data creation with array return type.
-    /// </summary>
-    /// <param name="entityFactory">A factory function that creates an array of entities.</param>
-    /// <returns>The array of created entities.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
-    public static System.Threading.Tasks.Task<System.Collections.Generic.List<T>> CreateAsync<T, TKey>(this ReadOnlyDbSet<T, TKey> readOnlyDbSet, System.Func<System.Collections.Generic.List<T>> entityFactory)
-        where T : class, IReadOnlyEntity<TKey>
-    {
-        ThrowIfInProduction();
-        var innerDbSet = GetInnerDbSet(readOnlyDbSet);
-        var entities = entityFactory();
-        foreach (var entity in entities)
-            innerDbSet.Add(entity);
-        return System.Threading.Tasks.Task.FromResult(entities);
+        /// <summary>
+        /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
+        /// Use only in testing or migration scenarios, never in production code.
+        /// 
+        /// Creates an array of entities using the provided factory function and adds them to the ReadOnlyDbSet.
+        /// This method bypasses read-only validation to enable bulk test data creation with array return type.
+        /// </summary>
+        /// <param name="entityFactory">A factory function that creates an array of entities.</param>
+        /// <returns>The array of created entities.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
+        public async Task<List<T>> CreateAsync(Func<List<T>> entityFactory)
+        {
+            ThrowIfInProduction();
+            var innerDbSet = GetInnerDbSet(readOnlyDbSet);
+            var entities = entityFactory();
+            foreach (var entity in entities)
+                await innerDbSet.AddAsync(entity);
+            return entities;
+        }
     }
 
     private static DbSet<T> GetInnerDbSet<T, TKey>(ReadOnlyDbSet<T, TKey> readOnlyDbSet)
@@ -101,7 +83,7 @@ public static class ReadOnlyDbSetExtensions
             if (prop.PropertyType == typeof(DbSet<T>))
                 return (DbSet<T>)prop.GetValue(readOnlyDbSet)!;
 
-        throw new System.InvalidOperationException(
+        throw new InvalidOperationException(
             "Unable to access InnerDbSet property from ReadOnlyDbSet. The ReadOnlyDbSet structure may have changed.");
     }
     
@@ -122,7 +104,7 @@ public static class ReadOnlyDbSetExtensions
 
         if (isProduction)
         {
-            throw new System.InvalidOperationException(
+            throw new InvalidOperationException(
                 "Bounteous.Data.Extensions is not intended for production use. " +
                 "This package bypasses read-only validation and should only be used in testing, " +
                 "migration, or development scenarios. " +

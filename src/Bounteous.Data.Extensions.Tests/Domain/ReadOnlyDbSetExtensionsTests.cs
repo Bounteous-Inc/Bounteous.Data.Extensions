@@ -4,6 +4,7 @@ using Bounteous.Data.Extensions.Readonly;
 using Bounteous.Data.Extensions.Tests.Context;
 using Bounteous.Data.Extensions.Tests.Helpers;
 using Bounteous.xUnit.Accelerator.Factory;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bounteous.Data.Extensions.Tests.Domain;
 
@@ -29,7 +30,7 @@ public class ReadOnlyDbSetExtensionsTests : DbContextTestBase
 
         CompanyEquals(actualCompany, company);
 
-        var savedCompany = await context.Companies.FindAsync(actualCompany.Id);
+        var savedCompany = await context.ReadOnlyCompanies.FirstOrDefaultAsync(x => x.Id == actualCompany.Id);
         savedCompany.Should().NotBeNull();
         savedCompany.Name.Should().Be(actualCompany.Name);
     }
@@ -46,6 +47,7 @@ public class ReadOnlyDbSetExtensionsTests : DbContextTestBase
 
         // Act
         var actualCompanies = await context.ReadOnlyCompanies.CreateAsync(() => expectedCompanies);
+        await context.SaveChangesAsync();
 
         // Assert
         actualCompanies.Should().NotBeNull();
@@ -57,7 +59,7 @@ public class ReadOnlyDbSetExtensionsTests : DbContextTestBase
         // Verify all companies were saved to database using their actual IDs
         foreach (var company in actualCompanies)
         {
-            var savedCompany = await context.Companies.FindAsync(company.Id);
+            var savedCompany = await context.ReadOnlyCompanies.FirstOrDefaultAsync(x => x.Id == company.Id);
             savedCompany.Should().NotBeNull();
             savedCompany.Name.Should().Be(company.Name);
         }

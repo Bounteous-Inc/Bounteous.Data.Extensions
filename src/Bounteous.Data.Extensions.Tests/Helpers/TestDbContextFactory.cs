@@ -1,15 +1,14 @@
 using Bounteous.Data.Extensions.Tests.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bounteous.Data.Extensions.Tests.Context;
+namespace Bounteous.Data.Extensions.Tests.Helpers;
 
-public class TestDbContextFactory : Bounteous.Data.DbContextFactory<TestDbContext, long>
+public class TestDbContextFactory(
+    IConnectionBuilder connectionBuilder,
+    IDbContextObserver observer,
+    IIdentityProvider<long> identityProvider)
+    : DbContextFactory<TestDbContext, long>(connectionBuilder, observer, identityProvider)
 {
-    public TestDbContextFactory(IConnectionBuilder connectionBuilder, IDbContextObserver observer, IIdentityProvider<long> identityProvider)
-        : base(connectionBuilder, observer, identityProvider)
-    {
-    }
-
     protected override TestDbContext Create(DbContextOptions applyOptions,
         IDbContextObserver dbContextObserver, IIdentityProvider<long> identityProvider)
     {
@@ -26,13 +25,8 @@ public class TestDbContextFactory : Bounteous.Data.DbContextFactory<TestDbContex
         return optionsBuilder.Options;
     }
 
-    /// <summary>
-    /// Creates default options for test scenarios.
-    /// </summary>
     public static DbContextOptions<TestDbContext> CreateOptions()
-    {
-        return new DbContextOptionsBuilder<TestDbContext>()
+        => new DbContextOptionsBuilder<TestDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-    }
 }

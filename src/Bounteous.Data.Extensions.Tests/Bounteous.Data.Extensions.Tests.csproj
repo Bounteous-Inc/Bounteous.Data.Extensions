@@ -12,6 +12,7 @@
     <ItemGroup>
         <PackageReference Include="AwesomeAssertions" Version="9.3.0" />
         <PackageReference Include="Bounteous.Core" Version="0.0.18" />
+        <PackageReference Include="Bounteous.Data" Version="0.0.26" />
         <PackageReference Include="Bounteous.xUnit.Accelerator" Version="0.0.9" />
         <PackageReference Include="coverlet.collector" Version="6.0.4">
           <PrivateAssets>all</PrivateAssets>

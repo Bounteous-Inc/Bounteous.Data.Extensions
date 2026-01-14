@@ -27,14 +27,6 @@ public class ReadOnlyDbSetValidationTests : DbContextTestBase
     }
 
     [Fact]
-    public void AsReadOnly_ShouldCreateReadOnlyWrapper()
-    {
-        var dbSet = context.Companies;
-        var readOnlyDbSet = dbSet.AsReadOnly<TestCompany, long>();
-        readOnlyDbSet.Should().NotBeNull();
-    }
-
-    [Fact]
     public async Task CreateAsyncShouldPreserveEntityProperties()
     {
         // Arrange

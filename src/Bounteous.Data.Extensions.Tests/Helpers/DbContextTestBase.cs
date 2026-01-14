@@ -25,18 +25,7 @@ public abstract class DbContextTestBase : IDisposable
     /// Creates a TestDbContext with the configured options.
     /// </summary>
     protected TestDbContext CreateContext()
-    {
-        return new TestDbContext(DbContextOptions, MockObserver.Object, IdentityProvider);
-    }
-
-    /// <summary>
-    /// Creates a TestDbContext with a specific user ID set.
-    /// </summary>
-    protected TestDbContext CreateContextWithUserId(long userId)
-    {
-        IdentityProvider.SetCurrentUserId(userId);
-        return CreateContext();
-    }
+        => new (DbContextOptions, MockObserver.Object, IdentityProvider);
 
     public virtual void Dispose()
     {
