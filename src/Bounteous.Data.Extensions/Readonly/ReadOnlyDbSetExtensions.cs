@@ -17,48 +17,49 @@ namespace Bounteous.Data.Extensions.Readonly;
 /// </summary>
 public static class ReadOnlyDbSetExtensions
 {
-    /// <param name="readOnlyDbSet"></param>
-    extension<T, TKey>(ReadOnlyDbSet<T, TKey> readOnlyDbSet) where T : class, IReadOnlyEntity<TKey>
+    /// <summary>
+    /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
+    /// Use only in testing or migration scenarios, never in production code.
+    /// 
+    /// Creates an entity using the provided factory function and adds it to the ReadOnlyDbSet.
+    /// This method bypasses read-only validation to enable test data creation.
+    /// </summary>
+    /// <param name="readOnlyDbSet">The ReadOnlyDbSet to add the entity to.</param>
+    /// <param name="entityFactory">A factory function that creates an entity.</param>
+    /// <returns>The created entity.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
+    public static async Task<T> CreateAsync<T, TKey>(this ReadOnlyDbSet<T, TKey> readOnlyDbSet, Func<T> entityFactory)
+        where T : class, IReadOnlyEntity<TKey>
     {
-        /// <summary>
-        /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
-        /// Use only in testing or migration scenarios, never in production code.
-        /// 
-        /// Creates an entity using the provided factory function and adds it to the ReadOnlyDbSet.
-        /// This method bypasses read-only validation to enable test data creation.
-        /// </summary>
-        /// <returns>The created entity.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
-        public async Task<T> CreateAsync(Func<T> entityFactory)
-        {
-            ThrowIfInProduction();
-            var innerDbSet = GetInnerDbSet(readOnlyDbSet);
-            var entity = entityFactory();
-            await innerDbSet.AddAsync(entity);
-            return entity;
-        }
+        ThrowIfInProduction();
+        var innerDbSet = GetInnerDbSet(readOnlyDbSet);
+        var entity = entityFactory();
+        await innerDbSet.AddAsync(entity);
+        return entity;
+    }
 
-        /// <summary>
-        /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
-        /// Use only in testing or migration scenarios, never in production code.
-        /// 
-        /// Creates an array of entities using the provided factory function and adds them to the ReadOnlyDbSet.
-        /// This method bypasses read-only validation to enable bulk test data creation with array return type.
-        /// </summary>
-        /// <param name="entityFactory">A factory function that creates an array of entities.</param>
-        /// <returns>The array of created entities.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
-        public async Task<List<T>> CreateAsync(Func<List<T>> entityFactory)
-        {
-            ThrowIfInProduction();
-            var innerDbSet = GetInnerDbSet(readOnlyDbSet);
-            var entities = entityFactory();
-            foreach (var entity in entities)
-                await innerDbSet.AddAsync(entity);
-            return entities;
-        }
+    /// <summary>
+    /// ⚠️ **PRODUCTION WARNING**: This method bypasses read-only validation.
+    /// Use only in testing or migration scenarios, never in production code.
+    /// 
+    /// Creates an array of entities using the provided factory function and adds them to the ReadOnlyDbSet.
+    /// This method bypasses read-only validation to enable bulk test data creation with array return type.
+    /// </summary>
+    /// <param name="readOnlyDbSet">The ReadOnlyDbSet to add the entities to.</param>
+    /// <param name="entityFactory">A factory function that creates an array of entities.</param>
+    /// <returns>The array of created entities.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
+    public static async Task<List<T>> CreateAsync<T, TKey>(this ReadOnlyDbSet<T, TKey> readOnlyDbSet, Func<List<T>> entityFactory)
+        where T : class, IReadOnlyEntity<TKey>
+    {
+        ThrowIfInProduction();
+        var innerDbSet = GetInnerDbSet(readOnlyDbSet);
+        var entities = entityFactory();
+        foreach (var entity in entities)
+            await innerDbSet.AddAsync(entity);
+        return entities;
     }
 
     private static DbSet<T> GetInnerDbSet<T, TKey>(ReadOnlyDbSet<T, TKey> readOnlyDbSet)
