@@ -38,10 +38,10 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <!-- Project References (for local development) -->
+  <!-- Package References (for all configurations) -->
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <ProjectReference Include="../../../Bounteous.Data/src/Bounteous.Data/Bounteous.Data.csproj" />
-    <ProjectReference Include="../../../Bounteous.Core/src/Bounteous.Core/Bounteous.Core.csproj" />
+    <PackageReference Include="Bounteous.Data" Version="0.0.26" />
+    <PackageReference Include="Bounteous.Core" Version="0.0.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
     <!-- SourceLink only included when building for CI/CD -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
