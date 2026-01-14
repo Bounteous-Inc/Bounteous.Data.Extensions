@@ -48,12 +48,20 @@
   </ItemGroup>
 
   <!-- Package References (for published package) -->
-  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+  <ItemGroup Condition="'$(Configuration)' == 'Release' AND '$(CI)' != 'true'">
     <PackageReference Include="Bounteous.Data" Version="0.0.26" />
     <PackageReference Include="Bounteous.Core" Version="0.0.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
     <!-- SourceLink only included when building for CI/CD -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
+  </ItemGroup>
+
+  <!-- Project References (for CI/CD builds) -->
+  <ItemGroup Condition="'$(Configuration)' == 'Release' AND '$(CI)' == 'true'">
+    <ProjectReference Include="../../../Bounteous.Data/src/Bounteous.Data/Bounteous.Data.csproj" />
+    <ProjectReference Include="../../../Bounteous.Core/src/Bounteous.Core/Bounteous.Core.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Content Files -->
