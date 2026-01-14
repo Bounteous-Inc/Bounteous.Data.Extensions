@@ -8,9 +8,9 @@
     
     <!-- NuGet Package Configuration -->
     <PackageId>Bounteous.Data.Extensions</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>0.0.1</PackageVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Title>⚠️ DEV ONLY - Bounteous.Data.Extensions</Title>
+    <Title>Bounteous.Data.Extensions - Developer tool</Title>
     <Description>
       ⚠️ NOT INTENDED FOR PRODUCTION USE ⚠️
       
