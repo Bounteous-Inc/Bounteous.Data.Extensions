@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- NuGet Package Configuration -->
+    <PackageId>Bounteous.Data.Extensions</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Title>⚠️ DEV ONLY - Bounteous.Data.Extensions</Title>
+    <Description>
+      ⚠️ NOT INTENDED FOR PRODUCTION USE ⚠️
+      
+      Developer utilities for Bounteous.Data including ReadOnlyDbSetExtensions for creating test objects.
+      
+      WARNING: This package bypasses read-only validation and should only be used in:
+      - Unit test projects
+      - Data migration projects
+      - Development environments
+      
+      DO NOT USE IN PRODUCTION CODE.
+    </Description>
+    <PackageTags>bounteous;data;extensions;development;testing;migrations;readonly;dev-only</PackageTags>
+    <Authors>Bounteous Inc.</Authors>
+    <Company>Bounteous Inc.</Company>
+    <Copyright>Copyright © Bounteous Inc. 2026</Copyright>
+    <RepositoryUrl>https://github.com/Bounteous-Inc/Bounteous.Data.Extensions</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <LicenseExpression>MIT</LicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- SourceLink configuration - only enabled in CI or when in git repository -->
+    <PublishRepositoryUrl Condition="'$(CI)' == 'true'">true</PublishRepositoryUrl>
+    <EmbedUntrackedSources Condition="'$(CI)' == 'true'">true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Project References (for local development) -->
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ProjectReference Include="../../../Bounteous.Data/src/Bounteous.Data/Bounteous.Data.csproj" />
+    <ProjectReference Include="../../../Bounteous.Core/src/Bounteous.Core/Bounteous.Core.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+    <!-- SourceLink only included when building for CI/CD -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
+  </ItemGroup>
+
+  <!-- Package References (for published package) -->
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <PackageReference Include="Bounteous.Data" Version="0.0.24" />
+    <PackageReference Include="Bounteous.Core" Version="0.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+    <!-- SourceLink only included when building for CI/CD -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
+  </ItemGroup>
+
+  <!-- Content Files -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
