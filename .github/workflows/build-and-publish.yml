@@ -8,35 +8,16 @@ on:
 jobs:
   publish:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-      
-      - name: Restore NuGet packages
-        run: dotnet restore './src/Bounteous.Data.Extensions/Bounteous.Data.Extensions.csproj'
-      
-      - name: Build Project
-        run: dotnet build './src/Bounteous.Data.Extensions/Bounteous.Data.Extensions.csproj' --configuration Release
-      
-      - name: Pack NuGet package
-        run: |
-          mkdir -p ./packages
-          dotnet pack './src/Bounteous.Data.Extensions/Bounteous.Data.Extensions.csproj' \
-            --configuration Release \
-            --output ./packages
-      
-      - name: Publish to NuGet
-        run: |
-          PACKAGE_FILE=$(find ./packages -name "*.nupkg" | head -n 1)
-          dotnet nuget push "$PACKAGE_FILE" \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
-            --source "${{ secrets.NUGET_SOURCE_URI }}/v3/index.json" \
-            --timeout 360 \
-            --skip-duplicate
+    uses: Bounteous-Inc/bounteous-dotnet-common-workflows/.github/workflows/build-and-publish-to-nuget.yml@main
+    with:
+      csproj-path: './src/Bounteous.Data.Extensions/Bounteous.Data.Extensions.csproj'
+      nuget-package-name: 'bounteous.data.extensions'
+      dotnet-version: '10.0.x'
+      release-path: 'net10.0'
+      build-configuration: 'Release'
+    secrets:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      NUGET_SOURCE_URI: ${{ secrets.NUGET_SOURCE_URI }}
   
   update-version:
     needs: publish
