@@ -23,14 +23,13 @@
       
       DO NOT USE IN PRODUCTION CODE.
     </Description>
-    <PackageTags>bounteous;data;extensions;development;testing;migrations;readonly;dev-only</PackageTags>
+    <PackageTags></PackageTags>
     <Authors>Bounteous Inc.</Authors>
     <Company>Bounteous Inc.</Company>
     <Copyright>Copyright © Bounteous Inc. 2026</Copyright>
-    <RepositoryUrl>https://github.com/Bounteous-Inc/Bounteous.Data.Extensions</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl></RepositoryUrl>
+    <RepositoryType></RepositoryType>
     <LicenseExpression>MIT</LicenseExpression>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- SourceLink configuration - only enabled in CI or when in git repository -->
