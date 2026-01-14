@@ -1,5 +1,7 @@
 using Bounteous.Data.Domain.Interfaces;
 using Bounteous.Data.Domain.ReadOnly;
+using Bounteous.Data.Extensions.Attributes;
+using Bounteous.Data.Extensions.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bounteous.Data.Extensions.Readonly;
@@ -15,6 +17,7 @@ namespace Bounteous.Data.Extensions.Readonly;
 /// 
 /// **DO NOT REFERENCE THIS PACKAGE IN PRODUCTION CODE**
 /// </summary>
+[ProductionUsage("This class contains development utilities that bypass read-only validation")]
 public static class ReadOnlyDbSetExtensions
 {
     /// <summary>
@@ -29,10 +32,11 @@ public static class ReadOnlyDbSetExtensions
     /// <returns>The created entity.</returns>
     /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
+    [ProductionUsage("This method bypasses read-only validation and should not be used in production")]
     public static async Task<T> CreateAsync<T, TKey>(this ReadOnlyDbSet<T, TKey> readOnlyDbSet, Func<T> entityFactory)
         where T : class, IReadOnlyEntity<TKey>
     {
-        ThrowIfInProduction();
+        ProductionWarningMarker.ValidateContext();
         var innerDbSet = GetInnerDbSet(readOnlyDbSet);
         var entity = entityFactory();
         await innerDbSet.AddAsync(entity);
@@ -51,10 +55,11 @@ public static class ReadOnlyDbSetExtensions
     /// <returns>The array of created entities.</returns>
     /// <exception cref="ArgumentNullException">Thrown when entityFactory is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown when used in production environment.</exception>
+    [ProductionUsage("This method bypasses read-only validation and should not be used in production")]
     public static async Task<List<T>> CreateAsync<T, TKey>(this ReadOnlyDbSet<T, TKey> readOnlyDbSet, Func<List<T>> entityFactory)
         where T : class, IReadOnlyEntity<TKey>
     {
-        ThrowIfInProduction();
+        ProductionWarningMarker.ValidateContext();
         var innerDbSet = GetInnerDbSet(readOnlyDbSet);
         var entities = entityFactory();
         foreach (var entity in entities)
@@ -86,30 +91,5 @@ public static class ReadOnlyDbSetExtensions
 
         throw new InvalidOperationException(
             "Unable to access InnerDbSet property from ReadOnlyDbSet. The ReadOnlyDbSet structure may have changed.");
-    }
-    
-    /// <summary>
-    /// Throws an exception if the current environment is production.
-    /// This prevents accidental usage of developer utilities in production.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown when running in production environment.</exception>
-    private static void ThrowIfInProduction()
-    {
-        var isProduction = 
-#if DEBUG
-            false;
-#else
-        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production" ||
-        Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Production";
-#endif
-
-        if (isProduction)
-        {
-            throw new InvalidOperationException(
-                "Bounteous.Data.Extensions is not intended for production use. " +
-                "This package bypasses read-only validation and should only be used in testing, " +
-                "migration, or development scenarios. " +
-                "Remove this package reference from production projects.");
-        }
     }
 }
