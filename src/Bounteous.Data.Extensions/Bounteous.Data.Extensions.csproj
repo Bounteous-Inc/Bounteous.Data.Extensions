@@ -42,7 +42,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <PackageReference Include="Bounteous.Data" Version="0.0.29" />
     <PackageReference Include="Bounteous.Core" Version="0.0.21" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
     <!-- SourceLink only included when building for CI/CD -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
   </ItemGroup>
@@ -51,7 +51,7 @@
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <PackageReference Include="Bounteous.Data" Version="0.0.29" />
     <PackageReference Include="Bounteous.Core" Version="0.0.21" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
     <!-- SourceLink only included when building for CI/CD -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
   </ItemGroup>
