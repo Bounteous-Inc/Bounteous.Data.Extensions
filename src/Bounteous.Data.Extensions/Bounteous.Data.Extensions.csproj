@@ -29,7 +29,7 @@
     <Copyright>Copyright © Bounteous Inc. 2026</Copyright>
     <RepositoryUrl></RepositoryUrl>
     <RepositoryType></RepositoryType>
-    <LicenseExpression>MIT</LicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- SourceLink configuration - only enabled in CI or when in git repository -->
