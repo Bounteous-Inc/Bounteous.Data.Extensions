@@ -58,7 +58,7 @@ ReadOnlyDbSetExtensions.CreateAsync()
 
 ### Test Infrastructure
 
-Tests use xUnit + AwesomeAssertions + Moq. The in-memory EF provider (`Microsoft.EntityFrameworkCore.InMemory`) backs `TestDbContext`. `Bounteous.xUnit.Accelerator` provides the FactoryGirl-style factory pattern (`CleanFactory`, `EntityFactory`).
+Tests use xUnit + AwesomeAssertions + Moq. The in-memory EF provider (`Microsoft.EntityFrameworkCore.InMemory`) backs `TestDbContext`. `Bounteous.xUnit.Accelerator` provides the FactoryGirl-style factory pattern (`CleanFactory`, `EntityFractory` — note: filename typo is intentional).
 
 ## CI/CD
 
