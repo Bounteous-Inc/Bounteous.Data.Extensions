@@ -68,3 +68,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Repository
 
 https://github.com/Bounteous-Inc/Bounteous.Data.Extensions
+
+<!-- trigger publish re-run -->
