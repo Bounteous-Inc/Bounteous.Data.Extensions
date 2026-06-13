@@ -72,3 +72,5 @@ https://github.com/Bounteous-Inc/Bounteous.Data.Extensions
 <!-- trigger publish re-run -->
 
 <!-- trigger publish: org-owned policy, user=Bounteous -->
+
+<!-- trigger: validate 0.0.2 publish -->
