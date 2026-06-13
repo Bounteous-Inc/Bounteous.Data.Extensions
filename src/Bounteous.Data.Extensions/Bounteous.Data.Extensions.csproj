@@ -11,6 +11,8 @@
     <PackageVersion>0.0.1</PackageVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Title>Bounteous.Data.Extensions - Developer tool</Title>
+    <LicenseExpression>MIT</LicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>
       ⚠️ NOT INTENDED FOR PRODUCTION USE ⚠️
       
@@ -23,13 +25,9 @@
       
       DO NOT USE IN PRODUCTION CODE.
     </Description>
-    <PackageTags></PackageTags>
     <Authors>Bounteous Inc.</Authors>
     <Company>Bounteous Inc.</Company>
     <Copyright>Copyright © Bounteous Inc. 2026</Copyright>
-    <RepositoryUrl></RepositoryUrl>
-    <RepositoryType></RepositoryType>
-    <LicenseExpression>MIT</LicenseExpression>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- SourceLink configuration - only enabled in CI or when in git repository -->
@@ -40,18 +38,18 @@
 
   <!-- Package References (for all configurations) -->
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <PackageReference Include="Bounteous.Data" Version="0.0.29" />
-    <PackageReference Include="Bounteous.Core" Version="0.0.21" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+    <PackageReference Include="Bounteous.Data" Version="0.0.30" />
+    <PackageReference Include="Bounteous.Core" Version="0.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
     <!-- SourceLink only included when building for CI/CD -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
   </ItemGroup>
 
   <!-- Package References (for published package) -->
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <PackageReference Include="Bounteous.Data" Version="0.0.29" />
-    <PackageReference Include="Bounteous.Core" Version="0.0.21" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+    <PackageReference Include="Bounteous.Data" Version="0.0.30" />
+    <PackageReference Include="Bounteous.Core" Version="0.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
     <!-- SourceLink only included when building for CI/CD -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(CI)' == 'true'" />
   </ItemGroup>
