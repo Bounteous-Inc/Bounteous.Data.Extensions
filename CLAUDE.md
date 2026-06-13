@@ -66,3 +66,5 @@ Tests use xUnit + AwesomeAssertions + Moq. The in-memory EF provider (`Microsoft
 - **Publish** — triggers on PR merged to `main`; uses NuGet Trusted Publishing (OIDC, no API key secret) via `bounteous-dotnet-common-workflows/build-and-publish-to-nuget.yml@main`; auto-increments patch version and commits updated `<Version>` back to `main` with `[skip ci]`
 
 Version is managed by CI — do not manually edit `<Version>` in the `.csproj`.
+
+The NuGet Trusted Publishing policy is registered against the `bounteous-dotnet-common-workflows` repository (where the reusable publish workflow lives), not this repo — because the OIDC `job_workflow_ref` claim resolves to the reusable workflow.
