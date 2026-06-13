@@ -4,41 +4,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Purpose
 
-`Bounteous.Data.Extensions` is a **development/test-only** NuGet package that extends `Bounteous.Data` to allow creating entities in read-only DbSets — bypassing read-only validation via reflection. **Never intended for production use.** Guards against accidental production use via `ProductionWarningMarker` / `ProductionDetector`.
+Development-only EF Core utility library. Provides extension methods on `ReadOnlyDbSet<T>` that bypass read-only validation for test seeding and data migrations. Guards against production use via multi-strategy environment detection.
 
 ## Commands
 
 ```bash
-dotnet build                                               # build solution
-dotnet test                                                # run all tests
-dotnet test --filter "DisplayName~SomeTestName"           # run single test
-dotnet test --filter "ClassName~ReadOnlyDbSetExtensions"  # run test class
-```
+# Build
+dotnet build Bounteous.Data.Extensions.sln
+dotnet build Bounteous.Data.Extensions.sln --configuration Release
 
-CI publishes to NuGet automatically on merge to `main` via trusted publishing (`.github/workflows/build-and-publish.yml`). PRs run build-only CI (`.github/workflows/ci-build.yml`).
+# Test (all)
+dotnet test src/Bounteous.Data.Extensions.Tests/Bounteous.Data.Extensions.Tests.csproj
+
+# Test (single test by name)
+dotnet test src/Bounteous.Data.Extensions.Tests/Bounteous.Data.Extensions.Tests.csproj \
+  --filter "FullyQualifiedName~<TestMethodName>"
+
+# Test (single class)
+dotnet test src/Bounteous.Data.Extensions.Tests/Bounteous.Data.Extensions.Tests.csproj \
+  --filter "ClassName=Bounteous.Data.Extensions.Tests.Domain.<ClassName>"
+```
 
 ## Architecture
 
-Two projects in `src/`:
-- `Bounteous.Data.Extensions` — the library
-- `Bounteous.Data.Extensions.Tests` — xUnit tests
+### Production Safety Chain
 
-### Library internals
+Every extension method call flows through this chain before executing:
 
-**`ReadOnlyDbSetExtensions`** (`Readonly/`) — the core feature. Extension methods on `ReadOnlyDbSet<T, TKey>` that use reflection to access the private `InnerDbSet` property and add entities directly. Entry point for all callers.
+```
+ReadOnlyDbSetExtensions.CreateAsync()
+  → ProductionWarningMarker.ValidateContext()
+    → ProductionDetector.IsProductionEnvironment (Lazy<bool>)
+    → ProductionDetector.IsAllowedContext (Lazy<bool>)
+```
 
-**`ProductionWarningMarker`** — validation gate called at the top of every extension method. Throws `InvalidOperationException` if running in production.
+**`ProductionDetector`** (`Utilities/ProductionDetector.cs`) — lazy-cached, multi-strategy detection:
+- Always returns `IsProductionEnvironment = false` in `DEBUG` builds
+- In `RELEASE`: checks env vars (`ASPNETCORE_ENVIRONMENT`, `DOTNET_ENVIRONMENT`, cloud provider vars), process names (IIS, nginx), and assembly name patterns before defaulting to production=true
+- `IsAllowedContext`: detects test/migration context via presence of test framework assemblies (xunit, nunit, moq, etc.), EF tooling process names (`dotnet-ef`), call stack analysis
 
-**`ProductionDetector`** (`Utilities/`) — lazy-cached, multi-strategy detection: DEBUG build flag → explicit env vars (`ASPNETCORE_ENVIRONMENT` etc.) → cloud hosting indicators → assembly name patterns → migration context → test framework assemblies. Results cached via `Lazy<bool>`.
+**`ProductionWarningMarker`** (`ProductionWarningMarker.cs`) — throws `InvalidOperationException` if production is detected and context is not allowed.
 
-**`[ProductionUsage]`** (`Attributes/`) — attribute to mark APIs unsafe for production. Intended for static analysis warnings.
+**`ReadOnlyDbSetExtensions`** (`Readonly/ReadOnlyDbSetExtensions.cs`) — the public API:
+- `CreateAsync<T, TKey>(Func<T> entityFactory)` — creates single entity, bypasses read-only via reflection
+- `CreateAsync<T, TKey>(Func<List<T>> entityFactory)` — bulk variant, returns `List<T>`
+- Generic constraints: `T : class, IReadOnlyEntity<TKey>`
 
-### Test patterns
+### Dependencies
 
-All tests share `[Collection("Bounteous")]` backed by `TestCollection` / `TestFixture` (xUnit collection fixture). `TestFixture.ctor` chains `CleanFactory → EntityFractory` (note: filename typo intentional) to seed data; `Dispose` runs `CleanFactory` again.
+- **`Bounteous.Data`** — provides `DbContextBase<TKey>`, `ReadOnlyDbSet<T>`, `IReadOnlyEntity<TKey>`
+- **`Bounteous.Core`** — validation utilities, type helpers
+- **`Microsoft.EntityFrameworkCore 10.0.9`** — `DbSet<T>` accessed via reflection inside ReadOnlyDbSet
 
-`DbContextTestBase` (abstract) owns `DbContextOptions`, `MockObserver`, and `IdentityProvider` — extend for any test needing a real `TestDbContext`.
+### Test Infrastructure
 
-Test assertions use `AwesomeAssertions` (`Validate.Begin()...Check()` fluent API) — not FluentAssertions.
+Tests use xUnit + AwesomeAssertions + Moq. The in-memory EF provider (`Microsoft.EntityFrameworkCore.InMemory`) backs `TestDbContext`. `Bounteous.xUnit.Accelerator` provides the FactoryGirl-style factory pattern (`CleanFactory`, `EntityFractory` — note: filename typo is intentional).
 
-`TestCompany : ReadOnlyEntityBase<long>` is the canonical test entity; `TestDbContext : DbContextBase<long>` uses an in-memory EF Core provider.
+## CI/CD
+
+- **CI build** — triggers on push to any non-`main` branch; builds + tests via `bounteous-dotnet-common-workflows/ci-build.yml@main`
+- **Publish** — triggers on PR merged to `main`; uses NuGet Trusted Publishing (OIDC, no API key secret) via `bounteous-dotnet-common-workflows/build-and-publish-to-nuget.yml@main`; auto-increments patch version and commits updated `<Version>` back to `main` with `[skip ci]`
+
+Version is managed by CI — do not manually edit `<Version>` in the `.csproj`.
